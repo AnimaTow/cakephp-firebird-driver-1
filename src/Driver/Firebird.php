@@ -8,6 +8,7 @@
  * @copyright Copyright 2016 Maicon Amarante
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
 namespace CakephpFirebird\Driver;
 
 use PDO;
@@ -17,10 +18,12 @@ use Cake\Database\Driver\PDODriverTrait;
 use CakephpFirebird\Dialect\FirebirdDialectTrait;
 use CakephpFirebird\Schema\FirebirdSchema;
 use CakephpFirebird\Statement\FirebirdStatement;
+use Cake\Database\StatementInterface;
+use Cake\Database\Schema\SchemaDialect;
 
 class Firebird extends Driver
 {
-    use PDODriverTrait;
+    // use PDODriverTrait;
     use FirebirdDialectTrait;
 
     /**
@@ -41,12 +44,14 @@ class Firebird extends Driver
         'init' => [],
     ];
 
+    protected $_schemaDialect;
+
     /**
      * Establishes a connection to the database server
      *
      * @return bool true on success
      */
-    public function connect()
+    public function connect(): bool
     {
         if ($this->_connection) {
             return true;
@@ -75,7 +80,7 @@ class Firebird extends Driver
      *
      * @return bool true if it is valid to use this driver
      */
-    public function enabled()
+    public function enabled(): bool
     {
         return in_array('firebird', PDO::getAvailableDrivers());
     }
@@ -85,9 +90,9 @@ class Firebird extends Driver
      *
      * @return \CakephpFirebird\Schema\FirebirdSchema
      */
-    public function schemaDialect()
+    public function schemaDialect(): SchemaDialect
     {
-        if (!$this->_schemaDialect) {
+        if (!$this->_schemaDialect === null) {
             $this->_schemaDialect = new FirebirdSchema($this);
         }
         return $this->_schemaDialect;
@@ -97,9 +102,9 @@ class Firebird extends Driver
      * Prepares a sql statement to be executed
      *
      * @param string|\Cake\Database\Query $query The query to prepare.
-     * @return \Cake\Database\StatementInterface
+     * @return StatementInterface
      */
-    public function prepare($query)
+    public function prepare($query): StatementInterface
     {
         $this->connect();
         $isObject = $query instanceof Query;
@@ -113,7 +118,7 @@ class Firebird extends Driver
      *
      * @return bool true if driver supports dynamic constraints
      */
-    public function supportsDynamicConstraints()
+    public function supportsDynamicConstraints(): bool
     {
         return false;
     }
@@ -134,7 +139,7 @@ class Firebird extends Driver
     /**
      * @return string
      */
-    public function disableForeignKeySQL()
+    public function disableForeignKeySQL(): string
     {
         return 'select \'false\' from rdb$database';
     }
@@ -142,7 +147,7 @@ class Firebird extends Driver
     /**
      * @return string
      */
-    public function enableForeignKeySQL()
+    public function enableForeignKeySQL(): string
     {
         return 'select \'false\' from rdb$database';
     }
@@ -150,7 +155,7 @@ class Firebird extends Driver
     /**
      * @return bool
      */
-    public function isConnected()
+    public function isConnected(): bool
     {
         if ($this->_connection === null) {
             $connected = false;
